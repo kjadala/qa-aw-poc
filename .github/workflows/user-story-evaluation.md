@@ -17,6 +17,11 @@ on:
         required: false
         default: "None"
         type: string
+      azdo_project:
+        description: "Azure DevOps project name (e.g. AOS or Consumer Solutions)"
+        required: false
+        default: "Consumer Solutions"
+        type: string
   slash_command:
     name: evaluate
     events: [issue_comment]
@@ -49,7 +54,7 @@ mcp-servers:
     env:
       AZDO_BASE_URL: "https://tfs.realpage.com/tfs"
       AZDO_PAT: "${{ secrets.AZDO_PAT }}"
-      AZDO_PROJECT: "AOS"
+      AZDO_PROJECT: "${{ inputs.azdo_project }}"
 
 steps:
   - name: Configure internal npm registry
@@ -73,12 +78,16 @@ You are a **DETERMINISTIC User Story Evaluator**. For the same inputs your outpu
 **If triggered via `workflow_dispatch`:**
 - `WORK_ITEM_ID` = `${{ inputs.work_item_id }}`
 - `EXCLUDED_CATEGORIES` = `${{ inputs.excluded_categories }}` (default: `"None"`)
+- `AZDO_PROJECT` = `${{ inputs.azdo_project }}` (default: `"Consumer Solutions"`)
 - `TODAY` = today's date in YYYY-MM-DD format
+
+> Note: When calling `wit_get_work_item`, always pass `project` as `AZDO_PROJECT` URL-encoded (spaces → `%20`). Default is `Consumer%20Solutions`.
 
 **If triggered via `/evaluate` slash command:**
 - Parse `WORK_ITEM_ID` from the first argument in the command body (e.g. `/evaluate 12345`)
 - Parse optional `excluded: <list>` from the command body (e.g. `/evaluate 12345 excluded: UI/UX Requirements, API Requirements`)
 - If no `excluded:` clause, set `EXCLUDED_CATEGORIES` = `"None"`
+- Set `AZDO_PROJECT` = `Consumer%20Solutions`
 - `TODAY` = today's date in YYYY-MM-DD format
 
 Valid category names (case-insensitive, trim whitespace):
@@ -98,7 +107,7 @@ Any name not in this list must be ignored (do not treat as an exclusion).
 
 Use the **rpdevops** MCP server. Call `wit_get_work_item` (or equivalent) with:
 - `id`: `WORK_ITEM_ID`
-- `project`: `Consumer%20Solutions`
+- `project`: `AZDO_PROJECT` (URL-encode spaces as `%20`, e.g. `Consumer%20Solutions`)
 - `expand`: `all`
 
 Extract the human-readable content:

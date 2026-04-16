@@ -62,6 +62,11 @@ name: "User Story Evaluation"
         description: Azure DevOps Work Item ID to evaluate (e.g. 12345)
         required: true
         type: string
+      azdo_project:
+        default: Consumer Solutions
+        description: "Azure DevOps project name (e.g. AOS or Consumer Solutions)"
+        required: false
+        type: string
 
 permissions: {}
 
@@ -272,6 +277,7 @@ jobs:
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
           GH_AW_INPUTS_EXCLUDED_CATEGORIES: ${{ inputs.excluded_categories }}
           GH_AW_INPUTS_WORK_ITEM_ID: ${{ inputs.work_item_id }}
+          GH_AW_INPUTS_AZDO_PROJECT: ${{ inputs.azdo_project }}
         with:
           script: |
             const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
@@ -292,6 +298,7 @@ jobs:
           GH_AW_GITHUB_WORKSPACE: ${{ github.workspace }}
           GH_AW_INPUTS_EXCLUDED_CATEGORIES: ${{ inputs.excluded_categories }}
           GH_AW_INPUTS_WORK_ITEM_ID: ${{ inputs.work_item_id }}
+          GH_AW_INPUTS_AZDO_PROJECT: ${{ inputs.azdo_project }}
           GH_AW_IS_PR_COMMENT: ${{ github.event.issue.pull_request && 'true' || '' }}
           GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ACTIVATED: ${{ needs.pre_activation.outputs.activated }}
           GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_MATCHED_COMMAND: ${{ needs.pre_activation.outputs.matched_command }}
@@ -681,7 +688,7 @@ jobs:
                 "env": {
                   "AZDO_BASE_URL": "https://tfs.realpage.com/tfs",
                   "AZDO_PAT": "\${AZDO_PAT}",
-                  "AZDO_PROJECT": "AOS"
+                  "AZDO_PROJECT": "Consumer Solutions"
                 },
                 "guard-policies": {
                   "write-sink": {
