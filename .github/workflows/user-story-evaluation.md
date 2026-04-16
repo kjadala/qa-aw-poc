@@ -43,6 +43,7 @@ mcp-servers:
     command: npx
     args:
       - "-y"
+      - "--registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/"
       - "@architecture/mcp-server-azuredevops@latest"
       - "Realpage"
     env:
