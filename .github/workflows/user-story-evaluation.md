@@ -17,11 +17,6 @@ on:
         required: false
         default: "None"
         type: string
-      azdo_project:
-        description: "Azure DevOps project name (e.g. AOS or Consumer Solutions)"
-        required: false
-        default: "Consumer Solutions"
-        type: string
   slash_command:
     name: evaluate
     events: [issue_comment]
@@ -54,7 +49,7 @@ mcp-servers:
     env:
       AZDO_BASE_URL: "https://tfs.realpage.com/tfs"
       AZDO_PAT: "${{ secrets.AZDO_PAT }}"
-      AZDO_PROJECT: "${{ inputs.azdo_project }}"
+      AZDO_PROJECT: "AOS"
 
 steps:
   - name: Configure internal npm registry
