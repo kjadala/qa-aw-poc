@@ -1,0 +1,79 @@
+name: TFS Work Item Analysis with Claude
+
+on:
+  workflow_dispatch:
+    inputs:
+      work_item_id:
+        description: "Enter TFS Work Item ID"
+        required: true
+        type: string
+
+jobs:
+  analyze:
+    runs-on: self-hosted
+
+    env:
+      TFS_URL: ${{ secrets.TFS_URL }}
+      TFS_PAT: ${{ secrets.TFS_PAT }}
+      CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Ensure jq is installed
+        run: |
+          if ! command -v jq &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+
+      - name: Get Work Item from TFS
+        run: |
+          curl -s -u :$TFS_PAT \
+          "$TFS_URL/_apis/wit/workitems/${{ github.event.inputs.work_item_id }}?api-version=6.0" \
+          -o workitem.json
+
+          cat workitem.json
+
+      - name: Extract fields
+        run: |
+          TITLE=$(jq -r '.fields["System.Title"]' workitem.json)
+          DESC=$(jq -r '.fields["System.Description"]' workitem.json)
+
+          CLEAN_DESC=$(echo "$DESC" | sed 's/<[^>]*>//g')
+
+          echo "TITLE=$TITLE" >> $GITHUB_ENV
+          echo "DESC=$CLEAN_DESC" >> $GITHUB_ENV
+
+      - name: Build prompt
+        run: |
+          echo "PROMPT<<EOF" >> $GITHUB_ENV
+          echo "Analyze this user story and provide:" >> $GITHUB_ENV
+          echo "- Story points" >> $GITHUB_ENV
+          echo "- Complexity" >> $GITHUB_ENV
+          echo "- Risks" >> $GITHUB_ENV
+          echo "- Suggestions" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "Title: $TITLE" >> $GITHUB_ENV
+          echo "Description: $DESC" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Call Claude API
+        run: |
+          curl -s https://api.anthropic.com/v1/messages \
+          -H "x-api-key: $CLAUDE_API_KEY" \
+          -H "anthropic-version: 2023-06-01" \
+          -H "content-type: application/json" \
+          -d "{
+            \"model\": \"claude-3-sonnet-20240229\",
+            \"max_tokens\": 800,
+            \"messages\": [
+              {\"role\": \"user\", \"content\": \"$PROMPT\"}
+            ]
+          }" > response.json
+
+          cat response.json
+
+      - name: Show result
+        run: |
+          jq -r '.content[0].text' response.json

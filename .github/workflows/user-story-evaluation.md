@@ -1,4 +1,6 @@
 ---
+engine: claude
+
 name: User Story Evaluation
 description: >
   Fetches an Azure DevOps work item via the rpdevops MCP server and produces a
