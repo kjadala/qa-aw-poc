@@ -45,19 +45,24 @@ secrets:
 
 mcp-servers:
   rpdevops:
-    command: /bin/sh
+    command: npx
     args:
-      - "-c"
-      - "echo //artifacts.realpage.com/artifactory/api/npm/npm-virtual/:_authToken=${ARTIFACTORY_TOKEN} > /root/.npmrc && npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage"
+      - "-y"
+      - "--registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/"
+      - "@architecture/mcp-server-azuredevops@latest"
+      - "Realpage"
     env:
       AZDO_BASE_URL: "https://tfs.realpage.com/tfs"
       AZDO_PAT: "${{ secrets.AZDO_PAT }}"
       AZDO_PROJECT: "AOS"
-      ARTIFACTORY_TOKEN: "${{ secrets.ARTIFACTORY_TOKEN }}"
+      NPM_TOKEN: "${{ secrets.ARTIFACTORY_TOKEN }}"
+      NPM_CONFIG_USERCONFIG: "/tmp/npmrc-rpdevops"
 
 steps:
   - name: Configure internal npm registry
     run: npm config set @architecture:registry https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/
+  - name: Create Artifactory auth config for MCP container
+    run: echo '//artifacts.realpage.com/artifactory/api/npm/npm-virtual/:_authToken=${NPM_TOKEN}' > /tmp/npmrc-rpdevops
 
 network:
   allowed:
