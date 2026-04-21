@@ -33,7 +33,7 @@ jobs:
 
       - name: Read config from workflow-analysis.md
         run: |
-          CONFIG_FILE=".github/workflows/workflow-analysis.md"
+          CONFIG_FILE=".github/workflow-analysis.md"
 
           # Extract YAML frontmatter (between --- markers)
           sed -n '/^---$/,/^---$/p' "$CONFIG_FILE" | sed '1d;$d' > frontmatter.yml

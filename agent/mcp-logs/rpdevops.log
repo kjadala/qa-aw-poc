@@ -1,0 +1,31 @@
+[2026-04-16T03:30:19Z] [DEBUG] [backend] GetOrLaunch called for server: rpdevops
+[2026-04-16T03:30:19Z] [INFO] [backend] Launching MCP backend server: server=rpdevops, command=docker, args=[run --rm -i -e NO_COLOR=... -e TERM=... -e PYTHONUNBUFFERED=... --entrypoint npx -e AZDO_BASE_URL=http... -e AZDO_PAT=abf3... -e AZDO_PROJECT=... node:lts-alpine npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage]
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm error code E403
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm error 403 403 Forbidden - GET https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/@architecture%2fmcp-server-azuredevops
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm error 403 In most cases, you or one of your dependencies are requesting
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm error 403 a package version that is forbidden by your security policy, or
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm error 403 on a server you do not have access to.
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm error A complete log of this run can be found in: /root/.npm/_logs/2026-04-16T03_30_20_643Z-debug-0.log
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm notice
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm notice New minor version of npm available! 11.11.0 -> 11.12.1
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.12.1
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm notice To update run: npm install -g npm@11.12.1
+[2026-04-16T03:30:21Z] [INFO] [backend] [stderr] npm notice
+[2026-04-16T03:30:21Z] [ERROR] [backend] MCP backend connection failed: server=rpdevops, command=docker, args=[run --rm -i -e NO_COLOR=... -e TERM=... -e PYTHONUNBUFFERED=... --entrypoint npx -e AZDO_BASE_URL=http... -e AZDO_PAT=abf3... -e AZDO_PROJECT=... node:lts-alpine npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage], error=calling "initialize": EOF
+[2026-04-16T03:30:21Z] [ERROR] [backend] MCP backend connection failed: server=rpdevops, command=docker, args=[run --rm -i -e NO_COLOR=... -e TERM=... -e PYTHONUNBUFFERED=... --entrypoint npx -e AZDO_BASE_URL=http... -e AZDO_PAT=abf3... -e AZDO_PROJECT=... node:lts-alpine npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage], error=failed to connect: calling "initialize": EOF
+[2026-04-16T03:30:21Z] [WARN] [backend] Failed to register tools from rpdevops (took 2.051464601s): failed to connect: failed to create connection: failed to connect: calling "initialize": EOF
+[2026-04-16T03:30:51Z] [DEBUG] [backend] GetOrLaunch called for server: rpdevops
+[2026-04-16T03:30:51Z] [INFO] [backend] Launching MCP backend server: server=rpdevops, command=docker, args=[run --rm -i -e NO_COLOR=... -e TERM=... -e PYTHONUNBUFFERED=... --entrypoint npx -e AZDO_BASE_URL=http... -e AZDO_PAT=abf3... -e AZDO_PROJECT=... node:lts-alpine npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage]
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm error code E403
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm error 403 403 Forbidden - GET https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/@architecture%2fmcp-server-azuredevops
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm error 403 In most cases, you or one of your dependencies are requesting
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm error 403 a package version that is forbidden by your security policy, or
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm error 403 on a server you do not have access to.
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm error A complete log of this run can be found in: /root/.npm/_logs/2026-04-16T03_30_52_617Z-debug-0.log
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm notice
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm notice New minor version of npm available! 11.11.0 -> 11.12.1
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.12.1
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm notice To update run: npm install -g npm@11.12.1
+[2026-04-16T03:30:53Z] [INFO] [backend] [stderr] npm notice
+[2026-04-16T03:30:53Z] [ERROR] [backend] MCP backend connection failed: server=rpdevops, command=docker, args=[run --rm -i -e NO_COLOR=... -e TERM=... -e PYTHONUNBUFFERED=... --entrypoint npx -e AZDO_BASE_URL=http... -e AZDO_PAT=abf3... -e AZDO_PROJECT=... node:lts-alpine npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage], error=calling "initialize": EOF
+[2026-04-16T03:30:53Z] [ERROR] [backend] MCP backend connection failed: server=rpdevops, command=docker, args=[run --rm -i -e NO_COLOR=... -e TERM=... -e PYTHONUNBUFFERED=... --entrypoint npx -e AZDO_BASE_URL=http... -e AZDO_PAT=abf3... -e AZDO_PROJECT=... node:lts-alpine npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage], error=failed to connect: calling "initialize": EOF

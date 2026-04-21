@@ -55,7 +55,7 @@ mcp-servers:
 
 steps:
   - name: Configure internal npm registry
-    run: npm config set registry https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/
+    run: npm config set @architecture:registry https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/
 
 network:
   allowed:
