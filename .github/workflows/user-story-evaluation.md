@@ -39,19 +39,21 @@ secrets:
   AZDO_PAT:
     value: "${{ secrets.AZDO_PAT }}"
     description: "Azure DevOps Personal Access Token for tfs.realpage.com"
+  ARTIFACTORY_TOKEN:
+    value: "${{ secrets.ARTIFACTORY_TOKEN }}"
+    description: "JFrog Artifactory token for artifacts.realpage.com npm registry"
 
 mcp-servers:
   rpdevops:
-    command: npx
+    command: /bin/sh
     args:
-      - "-y"
-      - "--registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/"
-      - "@architecture/mcp-server-azuredevops@latest"
-      - "Realpage"
+      - "-c"
+      - "echo //artifacts.realpage.com/artifactory/api/npm/npm-virtual/:_authToken=${ARTIFACTORY_TOKEN} > /root/.npmrc && npx -y --registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/ @architecture/mcp-server-azuredevops@latest Realpage"
     env:
       AZDO_BASE_URL: "https://tfs.realpage.com/tfs"
       AZDO_PAT: "${{ secrets.AZDO_PAT }}"
       AZDO_PROJECT: "AOS"
+      ARTIFACTORY_TOKEN: "${{ secrets.ARTIFACTORY_TOKEN }}"
 
 steps:
   - name: Configure internal npm registry
