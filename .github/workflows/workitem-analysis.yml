@@ -1,0 +1,101 @@
+name: TFS Work Item Analysis with Claude
+
+on:
+  workflow_dispatch:
+    inputs:
+      work_item_id:
+        description: "Enter TFS Work Item ID"
+        required: true
+        type: string
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    env:
+      TFS_URL: ${{ secrets.TFS_URL }}
+      TFS_PAT: ${{ secrets.TFS_PAT }}
+      CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Ensure jq and yq are installed
+        run: |
+          if ! command -v jq &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          if ! command -v yq &> /dev/null; then
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+
+      - name: Read config from workflow-analysis.md
+        run: |
+          CONFIG_FILE=".github/workflow-analysis.md"
+
+          # Extract YAML frontmatter (between --- markers)
+          sed -n '/^---$/,/^---$/p' "$CONFIG_FILE" | sed '1d;$d' > frontmatter.yml
+
+          # Parse settings from frontmatter
+          MODEL=$(yq -r '.model' frontmatter.yml)
+          MAX_TOKENS=$(yq -r '.max_tokens' frontmatter.yml)
+          ANTHROPIC_VERSION=$(yq -r '.anthropic_version' frontmatter.yml)
+          TFS_API_VERSION=$(yq -r '.tfs.api_version' frontmatter.yml)
+
+          echo "MODEL=$MODEL" >> $GITHUB_ENV
+          echo "MAX_TOKENS=$MAX_TOKENS" >> $GITHUB_ENV
+          echo "ANTHROPIC_VERSION=$ANTHROPIC_VERSION" >> $GITHUB_ENV
+          echo "TFS_API_VERSION=$TFS_API_VERSION" >> $GITHUB_ENV
+
+          # Extract prompt template (everything after the second --- marker)
+          sed -n '/^---$/,/^---$/!p' "$CONFIG_FILE" | sed '/^$/N;/^\n$/d' > prompt_template.txt
+
+          echo "Config loaded: model=$MODEL, max_tokens=$MAX_TOKENS, api_version=$TFS_API_VERSION"
+
+      - name: Get Work Item from TFS
+        run: |
+          curl -s -u :$TFS_PAT \
+          "$TFS_URL/_apis/wit/workitems/${{ github.event.inputs.work_item_id }}?api-version=$TFS_API_VERSION" \
+          -o workitem.json
+
+          cat workitem.json
+
+      - name: Extract fields and build prompt
+        run: |
+          TITLE=$(jq -r '.fields["System.Title"]' workitem.json)
+          DESC=$(jq -r '.fields["System.Description"]' workitem.json | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&gt;/>/g; s/&lt;/</g; s/&amp;/\&/g')
+
+          # Read prompt template from MD file and append work item details
+          PROMPT_TEMPLATE=$(cat prompt_template.txt)
+          PROMPT="${PROMPT_TEMPLATE}
+
+          ---
+          Title: ${TITLE}
+          Description: ${DESC}"
+
+          # Use jq to safely build JSON payload (handles newlines/special chars)
+          jq -n \
+            --arg prompt "$PROMPT" \
+            --arg model "$MODEL" \
+            --argjson max_tokens "$MAX_TOKENS" \
+            '{
+              model: $model,
+              max_tokens: $max_tokens,
+              messages: [{role: "user", content: $prompt}]
+            }' > payload.json
+
+      - name: Call Claude API
+        run: |
+          curl -s https://api.anthropic.com/v1/messages \
+          -H "x-api-key: $CLAUDE_API_KEY" \
+          -H "anthropic-version: $ANTHROPIC_VERSION" \
+          -H "content-type: application/json" \
+          -d @payload.json > response.json
+
+          cat response.json
+
+      - name: Show result
+        run: |
+          jq -r '.content[0].text' response.json

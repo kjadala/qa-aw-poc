@@ -151,7 +151,7 @@ jobs:
         id: check-lock-file
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
-          GH_AW_WORKFLOW_FILE: "workitem-analysis.lock.yml"
+          GH_AW_WORKFLOW_FILE: "workitem-analysis-mcp.lock.yml"
           GH_AW_CONTEXT_WORKFLOW_REF: "${{ github.workflow_ref }}"
         with:
           script: |
@@ -242,7 +242,7 @@ jobs:
           cat "${RUNNER_TEMP}/gh-aw/prompts/github_mcp_tools_with_safeoutputs_prompt.md"
           cat << 'GH_AW_PROMPT_604526308eb5edb0_EOF'
           </system>
-          {{#runtime-import .github/workflows/workitem-analysis.md}}
+          {{#runtime-import .github/workflows/workitem-analysis-mcp.md}}
           GH_AW_PROMPT_604526308eb5edb0_EOF
           } > "$GH_AW_PROMPT"
       - name: Interpolate variables and render templates
@@ -330,7 +330,7 @@ jobs:
       GH_AW_ASSETS_BRANCH: ""
       GH_AW_ASSETS_MAX_SIZE_KB: 0
       GH_AW_MCP_LOG_DIR: /tmp/gh-aw/mcp-logs/safeoutputs
-      GH_AW_WORKFLOW_ID_SANITIZED: workitemanalysis
+      GH_AW_WORKFLOW_ID_SANITIZED: workitemanalysismcp
     outputs:
       checkout_pr_success: ${{ steps.checkout-pr.outputs.checkout_pr_success || 'true' }}
       effective_tokens: ${{ steps.parse-mcp-gateway.outputs.effective_tokens }}
@@ -952,7 +952,7 @@ jobs:
       contents: read
       issues: write
     concurrency:
-      group: "gh-aw-conclusion-workitem-analysis"
+      group: "gh-aw-conclusion-workitem-analysis-mcp"
       cancel-in-progress: false
     outputs:
       incomplete_count: ${{ steps.report_incomplete.outputs.incomplete_count }}
@@ -1035,7 +1035,7 @@ jobs:
           GH_AW_WORKFLOW_NAME: "Work Item Analysis"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_AGENT_CONCLUSION: ${{ needs.agent.result }}
-          GH_AW_WORKFLOW_ID: "workitem-analysis"
+          GH_AW_WORKFLOW_ID: "workitem-analysis-mcp"
           GH_AW_ENGINE_ID: "claude"
           GH_AW_SECRET_VERIFICATION_RESULT: ${{ needs.activation.outputs.secret_verification_result }}
           GH_AW_CHECKOUT_PR_SUCCESS: ${{ needs.agent.outputs.checkout_pr_success }}
@@ -1274,11 +1274,11 @@ jobs:
       issues: write
     timeout-minutes: 15
     env:
-      GH_AW_CALLER_WORKFLOW_ID: "${{ github.repository }}/workitem-analysis"
+      GH_AW_CALLER_WORKFLOW_ID: "${{ github.repository }}/workitem-analysis-mcp"
       GH_AW_EFFECTIVE_TOKENS: ${{ needs.agent.outputs.effective_tokens }}
       GH_AW_ENGINE_ID: "claude"
       GH_AW_ENGINE_MODEL: ${{ needs.agent.outputs.model }}
-      GH_AW_WORKFLOW_ID: "workitem-analysis"
+      GH_AW_WORKFLOW_ID: "workitem-analysis-mcp"
       GH_AW_WORKFLOW_NAME: "Work Item Analysis"
     outputs:
       code_push_failure_count: ${{ steps.process_safe_outputs.outputs.code_push_failure_count }}
