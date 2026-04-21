@@ -35,28 +35,26 @@ jobs:
 
           cat workitem.json
 
-      - name: Extract fields
+      - name: Extract fields and build prompt
         run: |
           TITLE=$(jq -r '.fields["System.Title"]' workitem.json)
-          DESC=$(jq -r '.fields["System.Description"]' workitem.json)
+          DESC=$(jq -r '.fields["System.Description"]' workitem.json | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&gt;/>/g; s/&lt;/</g; s/&amp;/\&/g')
 
-          CLEAN_DESC=$(echo "$DESC" | sed 's/<[^>]*>//g')
+          PROMPT="Analyze this user story and provide:
+          - Story points
+          - Complexity
+          - Risks
+          - Suggestions
 
-          echo "TITLE=$TITLE" >> $GITHUB_ENV
-          echo "DESC=$CLEAN_DESC" >> $GITHUB_ENV
+          Title: $TITLE
+          Description: $DESC"
 
-      - name: Build prompt
-        run: |
-          echo "PROMPT<<EOF" >> $GITHUB_ENV
-          echo "Analyze this user story and provide:" >> $GITHUB_ENV
-          echo "- Story points" >> $GITHUB_ENV
-          echo "- Complexity" >> $GITHUB_ENV
-          echo "- Risks" >> $GITHUB_ENV
-          echo "- Suggestions" >> $GITHUB_ENV
-          echo "" >> $GITHUB_ENV
-          echo "Title: $TITLE" >> $GITHUB_ENV
-          echo "Description: $DESC" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          # Use jq to safely build JSON payload (handles newlines/special chars)
+          jq -n --arg prompt "$PROMPT" '{
+            model: "claude-3-sonnet-20240229",
+            max_tokens: 800,
+            messages: [{role: "user", content: $prompt}]
+          }' > payload.json
 
       - name: Call Claude API
         run: |
@@ -64,13 +62,7 @@ jobs:
           -H "x-api-key: $CLAUDE_API_KEY" \
           -H "anthropic-version: 2023-06-01" \
           -H "content-type: application/json" \
-          -d "{
-            \"model\": \"claude-3-sonnet-20240229\",
-            \"max_tokens\": 800,
-            \"messages\": [
-              {\"role\": \"user\", \"content\": \"$PROMPT\"}
-            ]
-          }" > response.json
+          -d @payload.json > response.json
 
           cat response.json
 
