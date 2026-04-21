@@ -10,7 +10,7 @@ on:
 
 jobs:
   analyze:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     env:
       TFS_URL: ${{ secrets.TFS_URL }}
