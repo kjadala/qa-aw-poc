@@ -1,4 +1,4 @@
-name: TFS Work Item Analysis with Claude
+name: User Story Evaluation with Claude
 
 on:
   workflow_dispatch:
@@ -6,6 +6,11 @@ on:
       work_item_id:
         description: "Enter TFS Work Item ID"
         required: true
+        type: string
+      excluded_categories:
+        description: "Categories to exclude (comma-separated) or 'None'. Valid: Core Structure, Functional Requirements, Validation Specifications, UI/UX Requirements, API Requirements, DB Requirements, Non-Functional Requirements"
+        required: false
+        default: "None"
         type: string
 
 jobs:
@@ -50,30 +55,83 @@ jobs:
           echo "TFS_API_VERSION=$TFS_API_VERSION" >> $GITHUB_ENV
 
           # Extract prompt template (everything after the second --- marker)
-          sed -n '/^---$/,/^---$/!p' "$CONFIG_FILE" | sed '/^$/N;/^\n$/d' > prompt_template.txt
+          awk 'BEGIN{n=0} /^---$/{n++; if(n==2){found=1; next}} found{print}' "$CONFIG_FILE" > prompt_template.txt
 
           echo "Config loaded: model=$MODEL, max_tokens=$MAX_TOKENS, api_version=$TFS_API_VERSION"
 
       - name: Get Work Item from TFS
         run: |
-          curl -s -u :$TFS_PAT \
-          "$TFS_URL/_apis/wit/workitems/${{ github.event.inputs.work_item_id }}?api-version=$TFS_API_VERSION" \
-          -o workitem.json
+          WORK_ITEM_ID="${{ github.event.inputs.work_item_id }}"
 
-          cat workitem.json
+          HTTP_CODE=$(curl -s -o workitem.json -w "%{http_code}" -u :$TFS_PAT \
+            "$TFS_URL/_apis/wit/workitems/${WORK_ITEM_ID}?\$expand=all&api-version=$TFS_API_VERSION")
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Failed to fetch work item $WORK_ITEM_ID (HTTP $HTTP_CODE)"
+            cat workitem.json
+            exit 1
+          fi
+
+          echo "Work item fetched successfully"
 
       - name: Extract fields and build prompt
         run: |
-          TITLE=$(jq -r '.fields["System.Title"]' workitem.json)
-          DESC=$(jq -r '.fields["System.Description"]' workitem.json | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&gt;/>/g; s/&lt;/</g; s/&amp;/\&/g')
+          WORK_ITEM_ID="${{ github.event.inputs.work_item_id }}"
+          EXCLUDED="${{ github.event.inputs.excluded_categories }}"
+          TODAY=$(date +%Y-%m-%d)
 
-          # Read prompt template from MD file and append work item details
+          # Extract fields, strip HTML tags and decode entities
+          TITLE=$(jq -r '.fields["System.Title"] // "N/A"' workitem.json)
+          WI_TYPE=$(jq -r '.fields["System.WorkItemType"] // "User Story"' workitem.json)
+          STATE=$(jq -r '.fields["System.State"] // "Unknown"' workitem.json)
+          AREA_PATH=$(jq -r '.fields["System.AreaPath"] // "N/A"' workitem.json)
+          ITERATION_PATH=$(jq -r '.fields["System.IterationPath"] // "N/A"' workitem.json)
+
+          DESC=$(jq -r '.fields["System.Description"] // "No description provided"' workitem.json \
+            | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&gt;/>/g; s/&lt;/</g; s/&amp;/\&/g; s/&#[0-9]*;//g' \
+            | sed '/^$/N;/^\n$/d')
+
+          AC=$(jq -r '.fields["Microsoft.VSTS.Common.AcceptanceCriteria"] // "No acceptance criteria provided"' workitem.json \
+            | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&gt;/>/g; s/&lt;/</g; s/&amp;/\&/g; s/&#[0-9]*;//g' \
+            | sed '/^$/N;/^\n$/d')
+
+          # Build work item URL
+          AREA_PROJECT=$(echo "$AREA_PATH" | cut -d'\\' -f1)
+          ENCODED_PROJECT=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$AREA_PROJECT', safe=''))" 2>/dev/null || echo "$AREA_PROJECT")
+          WI_URL="https://tfs.realpage.com/tfs/Realpage/${ENCODED_PROJECT}/_workitems/edit/${WORK_ITEM_ID}"
+
+          # Read prompt template
           PROMPT_TEMPLATE=$(cat prompt_template.txt)
+
+          # Build the full prompt with work item details appended
           PROMPT="${PROMPT_TEMPLATE}
 
           ---
-          Title: ${TITLE}
-          Description: ${DESC}"
+
+          ## WORK ITEM DETAILS
+
+          - **WORK_ITEM_ID:** ${WORK_ITEM_ID}
+          - **WORK_ITEM_URL:** ${WI_URL}
+          - **EXCLUDED_CATEGORIES:** ${EXCLUDED}
+          - **TODAY:** ${TODAY}
+
+          ---
+
+          **Title:** ${TITLE}
+
+          **Work Item Type:** ${WI_TYPE}
+
+          **State:** ${STATE}
+
+          **Area Path:** ${AREA_PATH}
+
+          **Iteration Path:** ${ITERATION_PATH}
+
+          **Description:**
+          ${DESC}
+
+          **Acceptance Criteria:**
+          ${AC}"
 
           # Use jq to safely build JSON payload (handles newlines/special chars)
           jq -n \
@@ -86,16 +144,77 @@ jobs:
               messages: [{role: "user", content: $prompt}]
             }' > payload.json
 
+          # Save metadata for later steps
+          echo "WORK_ITEM_ID=$WORK_ITEM_ID" >> $GITHUB_ENV
+          echo "TODAY=$TODAY" >> $GITHUB_ENV
+          echo "WI_TYPE=$WI_TYPE" >> $GITHUB_ENV
+
       - name: Call Claude API
         run: |
-          curl -s https://api.anthropic.com/v1/messages \
-          -H "x-api-key: $CLAUDE_API_KEY" \
-          -H "anthropic-version: $ANTHROPIC_VERSION" \
-          -H "content-type: application/json" \
-          -d @payload.json > response.json
+          HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $CLAUDE_API_KEY" \
+            -H "anthropic-version: $ANTHROPIC_VERSION" \
+            -H "content-type: application/json" \
+            -d @payload.json)
 
-          cat response.json
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Claude API call failed (HTTP $HTTP_CODE)"
+            cat response.json
+            exit 1
+          fi
 
-      - name: Show result
+          echo "Claude API call successful"
+
+      - name: Generate evaluation report
         run: |
-          jq -r '.content[0].text' response.json
+          # Extract the evaluation text from Claude's response
+          EVAL_TEXT=$(jq -r '.content[0].text' response.json)
+
+          if [ -z "$EVAL_TEXT" ] || [ "$EVAL_TEXT" = "null" ]; then
+            echo "::error::Empty response from Claude API"
+            cat response.json
+            exit 1
+          fi
+
+          # Save as markdown file
+          REPORT_FILE="US-${WORK_ITEM_ID}-evaluation.md"
+          echo "$EVAL_TEXT" > "$REPORT_FILE"
+
+          echo "REPORT_FILE=$REPORT_FILE" >> $GITHUB_ENV
+          echo "Evaluation report saved to $REPORT_FILE"
+          echo "--- Report Preview (first 50 lines) ---"
+          head -50 "$REPORT_FILE"
+
+      - name: Commit evaluation report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "$REPORT_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit (report already exists with same content)"
+          else
+            git commit -m "Add evaluation report for US-${WORK_ITEM_ID} [skip ci]"
+            git push
+            echo "Report committed and pushed"
+          fi
+
+      - name: Upload evaluation report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report-${{ github.event.inputs.work_item_id }}
+          path: ${{ env.REPORT_FILE }}
+
+      - name: Summary
+        run: |
+          echo "## User Story Evaluation Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Work Item:** #${WORK_ITEM_ID}" >> $GITHUB_STEP_SUMMARY
+          echo "**Type:** ${WI_TYPE}" >> $GITHUB_STEP_SUMMARY
+          echo "**Report:** \`${REPORT_FILE}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat "$REPORT_FILE" >> $GITHUB_STEP_SUMMARY
