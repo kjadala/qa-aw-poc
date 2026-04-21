@@ -51,7 +51,7 @@ jobs:
 
           # Use jq to safely build JSON payload (handles newlines/special chars)
           jq -n --arg prompt "$PROMPT" '{
-            model: "claude-3-sonnet-20240229",
+            model: "claude-sonnet-4-20250514",
             max_tokens: 800,
             messages: [{role: "user", content: $prompt}]
           }' > payload.json
