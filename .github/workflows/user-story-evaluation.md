@@ -45,11 +45,19 @@ mcp-servers:
     command: npx
     args:
       - "-y"
-      - "@azure-devops/mcp"
-      - "Realpage"
-      - "tfs.realpage.com"
+      - "@web-marketing-hr/azure-devops-mcp"
+      - "Consumer Solutions"
+      - "--authentication"
+      - "envvar"
+      - "-d"
+      - "core"
+      - "work-items"
     env:
-      AZDO_PAT: "${{ secrets.AZDO_PAT }}"
+      ADO_MCP_MODE: "onprem"
+      ADO_MCP_AUTH_TYPE: "basic"
+      ADO_MCP_ORG_URL: "https://tfs.realpage.com/tfs/Realpage"
+      ADO_MCP_AUTH_TOKEN: "${{ secrets.AZDO_PAT }}"
+      ADO_MCP_API_VERSION: "6.0-preview"
 ---
 # User Story Evaluation Agent
 
