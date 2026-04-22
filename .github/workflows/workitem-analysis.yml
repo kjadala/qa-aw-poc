@@ -96,7 +96,7 @@ jobs:
             | sed '/^$/N;/^\n$/d')
 
           # Build work item URL
-          AREA_PROJECT=$(echo "$AREA_PATH" | cut -d'\\' -f1)
+          AREA_PROJECT=$(echo "$AREA_PATH" | awk -F'\\\\' '{print $1}')
           ENCODED_PROJECT=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$AREA_PROJECT', safe=''))" 2>/dev/null || echo "$AREA_PROJECT")
           WI_URL="https://tfs.realpage.com/tfs/Realpage/${ENCODED_PROJECT}/_workitems/edit/${WORK_ITEM_ID}"
 
