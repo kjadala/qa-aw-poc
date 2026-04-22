@@ -16,6 +16,8 @@ on:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     env:
       TFS_URL: ${{ secrets.TFS_URL }}
