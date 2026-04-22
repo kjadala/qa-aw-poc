@@ -27,13 +27,6 @@ network:
 permissions:
   contents: read
   issues: read
-safe-outputs:
-  create-issue:
-    labels:
-    - test-case-generation
-    - automated
-    max: 1
-    title-prefix: "[TC-Gen] "
 secrets:
   AZDO_PAT:
     description: Azure DevOps Personal Access Token for tfs.realpage.com
@@ -245,13 +238,13 @@ Before emitting the issue, verify ALL of the following. If any check fails, corr
 - [ ] Priority assignments are consistent with risk impact
 - [ ] Test data uses realistic, concrete values
 - [ ] User Story Content shows human-readable text — NOT raw JSON or HTML
-- [ ] CSV content matches the test cases in the issue body exactly
+- [ ] CSV content matches the test cases in the report exactly
 
 ---
 
 ## STEP 7 — Generate CSV Content
 
-After generating all test cases, produce a CSV-formatted table that can be copied and saved as a `.csv` file or imported into test management tools (e.g., Azure Test Plans, Jira, TestRail, qTest).
+After generating all test cases, produce a CSV-formatted table that can be saved as a `.csv` file or imported into test management tools (e.g., Azure Test Plans, Jira, TestRail, qTest).
 
 ### CSV Format
 
@@ -270,17 +263,15 @@ Test Case ID,Title,Type,Priority,Preconditions,Steps,Expected Result,Test Data,T
 6. All test cases from all generated types must be included
 7. Sort rows by Test Case ID
 
-Include this CSV as a fenced code block (with `csv` language tag) in the issue body under a dedicated **CSV Download** section so users can easily copy it.
+Include this CSV as a fenced code block (with `csv` language tag) under a dedicated **CSV Download** section in the output.
 
 ---
 
-## STEP 8 — Emit the Test Cases Issue
+## STEP 8 — Output the Report
 
-Output a `create_issue` safe output with this exact structure:
+Output the full test case generation report directly as your response. Do NOT use `create_issue`. Simply output the complete markdown report as your final answer — it will be automatically captured in the workflow run artifacts (`agent_output.json`) for download.
 
-**Title**: `TC-[WORK_ITEM_ID] Test Cases — [WORK_ITEM_TITLE (truncated to 60 chars)]`
-
-**Body** (use this exact template):
+Use this exact template:
 
 ```
 # Test Case Generation Report
@@ -431,6 +422,7 @@ Test Case ID,Title,Type,Priority,Preconditions,Steps,Expected Result,Test Data,T
 1. Go to Actions → Test Case Generation → Run workflow
 2. Enter the Azure DevOps Work Item ID
 3. Optionally specify test types to generate
+4. After the run completes, download the **agent** artifact from the run page — it contains `agent_output.json` with the full report and CSV
 
 **Via slash command (in any issue comment):**
 ```

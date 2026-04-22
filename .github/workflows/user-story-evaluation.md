@@ -27,13 +27,6 @@ network:
 permissions:
   contents: read
   issues: read
-safe-outputs:
-  create-issue:
-    labels:
-    - user-story-evaluation
-    - automated
-    max: 1
-    title-prefix: "[US-Eval] "
 secrets:
   AZDO_PAT:
     description: Azure DevOps Personal Access Token for tfs.realpage.com
@@ -244,13 +237,11 @@ Before emitting the issue, verify ALL of the following. If any check fails, corr
 
 ---
 
-## STEP 5 — Emit the Evaluation Issue
+## STEP 5 — Output the Evaluation Report
 
-Output a `create_issue` safe output with this exact structure:
+Output the full evaluation report directly as your response. Do NOT use `create_issue`. Simply output the complete markdown report as your final answer — it will be automatically captured in the workflow run artifacts (`agent_output.json`) for download.
 
-**Title**: `US-[WORK_ITEM_ID] Evaluation — [Rating Label] ([X.X]/10.0)`
-
-**Body** (use this exact template):
+Use this exact template:
 
 ```
 # User Story Evaluation
@@ -352,6 +343,7 @@ For excluded categories: show heading with "(Category excluded from evaluation)"
 1. Go to Actions → User Story Evaluation → Run workflow
 2. Enter the Azure DevOps Work Item ID
 3. Optionally enter categories to exclude
+4. After the run completes, download the **agent** artifact from the run page — it contains `agent_output.json` with the full evaluation report
 
 **Via slash command (in any issue comment):**
 ```
