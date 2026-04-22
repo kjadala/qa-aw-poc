@@ -1,7 +1,7 @@
 # User Story Evaluation
 
 **Work Item:** [#1727233](https://tfs.realpage.com/tfs/Realpage/AOS/_workitems/edit/1727233)
-**Date:** 2026-04-16
+**Date:** 2026-04-22
 
 ---
 
@@ -9,39 +9,13 @@
 
 **Title:** Settings - Floor Plan - List View - Auto Pilot (2 of 2) - Columns Filter Data and Interaction of Colum filter With Horizontal filter
 
+**Work Item Type:** User Story
+
 **Description:**
-As an RM user on Settings > New Floor Plan Parameters > List View > Column Filter, I want each section of the 'Column Filter' aside to display the parameters that I have selected via the dropdown, so that I may have visibility on my selection and a way to deselect using the 'x'.
-
-Furthermore I want that the horizontal filter option and Column filter option be independent of each other and not work in conjunction (on top of) with each other for a smooth user experience.
-
-> **Note:** This enhancement is for US, UK and Canadian sites and for all property types.
-> AC001, 002 for Column Filter Functionality covered on [#1708534](https://tfs.realpage.com/tfs/Realpage/AOS/_workitems/edit/1708534).
-> Figma: https://www.figma.com/proto/hls5z78A4AL5MzKqd3IwbS/Setting-Updates?node-id=1009-169195
+As an RM user on Settings > New Floor Plan Parameters > List View > Column Filter, I want each section of the 'Column Filter' aside display the parameters that I have selected via the dropdown so that I may have visibility on my selection and a way to deselect using the 'x'Further more I want that the horizontal filter option and Column filter option be independent of each other and not work in conjunction (on top of) with each other for a smooth user experience.Note:This enhancement is for US, UK and Canadian sites and for all property typesAC001, 002, for Column Filter Functionality covered  on 1708534, this ticket to cover correct data display based on column filter selection and the Interaction of Colum filter With Horizontal filterhttps://www.figma.com/proto/hls5z78A4AL5MzKqd3IwbS/Setting-Updates?node-id=1009-169195&scaling=contain&page-id=0%3A1&starting-point-node-id=128%3A122251
 
 **Acceptance Criteria:**
-
-**AC001** — Given an RM user on Settings > Floor Plan Parameters > List View, when I click the 'Column Filters' button, then an aside opens with:
-- Header: "Column Filters"
-- Parameter labels displayed section-wise under each corresponding section
-- Three buttons: Clear Filters (only when ≥1 parameter selected), Close, Apply Filters (disabled when no selections)
-
-**AC002** — Given the Column Filters Aside is open, when I select one or more parameters across same or different sections, then my selected parameter labels are displayed:
-- Under each corresponding section
-- In alphabetical order per section (post selection)
-- In blue highlight with an 'x' to cancel/remove
-- Apply Filters button is enabled
-
-**AC003a** — When I click 'Clear Filters', then selections clear out and uncheck, aside remains open, no filters are set.
-
-**AC003b** — When I click 'Apply Filters', then aside closes and the list view grid only reflects the selected column filter parameters; grid width adjusts based on grid content.
-
-**AC004** — Given column filters are selected, when I make changes (add/remove) to property or FP dropdown selections, then column filter selections are retained and grid displays correct data; grid width adjusts based on grid content.
-
-**AC005** — Given one or more column filters are applied, when I navigate to a different Settings tab, different workflow, hit back in browser, or refresh, then the page resets to default view (no filters selected, 'All' defaults).
-
-**AC006** — (Mutual exclusivity) When I have applied horizontal filters and then apply column filters, then horizontal filters are cleared and only column filters remain active.
-
-**AC007** — (Mutual exclusivity) When I have applied column filters and then apply horizontal filters, then column filters are cleared and only horizontal filters remain active.
+001 Given an RM user on Settings > Floor Plan Parameters > List View  When I click the 'Column Filters' button Then an aside opens up where  Header: Column Filters Parameter labels are displayed section-wise under each corresponding section (ex: General parameter selected are displayed under General parameters) Three button Clear Filters (only shows up when at lease one parameter is selected Close Apply Filters (is disabled when no parameter selections are made)    002  Given an RM user on Settings > Floor Plan Parameters > List View > Column Filters Aside When I select one or more parameters across same or different parameter sections Then my selected parameter labels are displayed on the aside Under each corresponding section (ex: General parameter selected are displayed under General parameters)  in alphabetical order in each separate section (post selection) In blue highlight with an 'x' option to cancel/remove the selection  And the 'Apply Filters' button is enabled    *** AC001, 002 for Column Filter Functionality covered on https://tfs.realpage.com/tfs/Realpage/AOS/_workitems/edit/1708534****  003a Given an RM user on Settings > Floor Plan Parameters > List View > Column Filters Aside And I select one or more parameters across same or different parameter sections When I click the 'Clear Filters' button  Then my selected clear out and uncheck And my aside remains open And no filters are set      003b Given an RM user on Settings > Floor Plan Parameters > List View > Column Filters Aside And I select one or more parameters across same or different parameter sections And my selected parameter labels are displayed on the aside with the look and feel of AC002 When I click the 'Apply Filters' button  Then my aside closes And the list view grid only reflects the parameters that I selected via the Column Filters aside And grid width adjusts based on the grid content       004  Given an RM User on Settings > Floor Plan Parameters > List View And I have some column filters selected When I  make changes (add, remove) to my property selections on the Property dropdown and FP dropdown (not thru property picker) Or  Save changes (not developed yet)  Or Cancel (not developed yet)    Then my column filter selections are retained And my grid displays the correct data corresponding to the chosen filters And grid width adjusts based on the grid content   005 Given an RM user on Floor Plan Parameter >List View And I have applied one or more column filters    When I move to a different Settings tab, a different workflow, hit the back browser or refresh my page And I return to Floor Plan Parameter >List View  Then my page resets to default view (no filters selected, 'All' defaults)           006 User can have either horizontal filters or column Filters but not both Given an RM user on  Floor Plan Parameter >List View When I have applied one or more horizontal filter options And then apply one or more column filters Then the horizontal filters are cleared (no buttons are lit up or checked, all buttons are grey, grid does not reflect selection made previously on the horizontal filters) And only my column filters remain active (selections are present on the list view grid, main Column Filter button is lit up and the number of parameters are listed, selections are highlighted in the aside) And grid width adjusts based on the grid content   007 User can have either horizontal filters or column Filters but not both  Given an RM user on  Floor Plan Parameter >List View When I have applied one or more column filter options And then apply one or more horizontal filters Then the column filters are cleared (no selections are present on the grid or highlighted in the aside; main column filter button is NOT lit up and the number of parameters are NOT listed) And only my horizontal filters remain active (lit up, check marked, grid reflects the horizontal filter selections) And grid width adjusts based on the grid content
 
 ---
 
@@ -50,24 +24,24 @@ Furthermore I want that the horizontal filter option and Column filter option be
 **Selected Framework Row:** Row 1
 **Excluded Categories:** None
 
-| Core Structure | Functional Req. | Validation Specs | Non-Functional | UI/UX | API | DB | Total % |
-|----------------|-----------------|------------------|----------------|-------|-----|----|---------|
-| 30%            | 15%             | 15%              | 10%            | 10%   | 10% | 10%| 100%    |
+| Core Structure | Functional Requirements | Validation Specifications | Non-Functional Requirements | UI/UX Requirements | API Requirements | DB Requirements | Total % |
+|----------------|------------------------|---------------------------|----------------------------|-------------------|------------------|-----------------|---------|
+| 30%            | 15%                    | 15%                       | 10%                        | 10%              | 10%              | 10%             | 100%    |
 
 ---
 
 ## Evaluation Matrix
 
-| Category                    | Weight | Score (1–10) | Weighted Score | Comments                                                         |
-|-----------------------------|--------|--------------|----------------|------------------------------------------------------------------|
-| Core Structure              | 30%    | 8.0          | 2.4            | Strong "As a / I want / So that" format; 7 detailed ACs; missing negative/error ACs |
-| Functional Requirements     | 15%    | 8.0          | 1.2            | All interactions, outcomes, and paths well-covered; Save/Cancel noted as not yet developed |
-| Validation Specifications   | 15%    | 4.0          | 0.6            | Independently testable with clear success criteria; no test data or sample scenarios |
-| Non-Functional Requirements | 10%    | 1.0          | 0.1            | None specified; performance, scalability, security all absent |
-| UI/UX Requirements          | 10%    | 4.0          | 0.4            | Visual appearance, layout, and Figma link present; missing responsiveness, browser support, localization |
-| API Requirements            | 10%    | 1.0          | 0.1            | No API endpoints, methods, or response formats defined |
-| DB Requirements             | 10%    | 1.0          | 0.1            | No data storage, tables, or constraints defined |
-| **TOTAL**                   | **100%**| **3.9**     | **4.9**        | **Adequate — Basic details but gaps exist** |
+| Category | Weight | Score (1–10) | Weighted Score | Comments |
+|----------|--------|--------------|----------------|----------|
+| Core Structure | 30% | 8.0 | 2.4 | Good structure with comprehensive acceptance criteria |
+| Functional Requirements | 15% | 9.0 | 1.4 | Very detailed functional specifications |
+| Validation Specifications | 15% | 7.0 | 1.1 | Good test scenarios but missing specific data requirements |
+| Non-Functional Requirements | 10% | 3.0 | 0.3 | Limited performance and security specifications |
+| UI/UX Requirements | 10% | 8.0 | 0.8 | Good visual and interaction details |
+| API Requirements | 10% | 2.0 | 0.2 | No API specifications provided |
+| DB Requirements | 10% | 2.0 | 0.2 | No database requirements specified |
+| **TOTAL** | **100%** | **5.6** | **6.4** | **Good — Mostly complete with minor gaps** |
 
 ---
 
@@ -75,137 +49,123 @@ Furthermore I want that the horizontal filter option and Column filter option be
 
 ### 1. Core Structure
 
-✓ Uses "As a [user], I want..., So that..." format
-✓ Identifies user role (RM user)
-✓ Specifies user goal (display column filter selections; independent filter behavior)
-✓ States user value (visibility on selections and ability to deselect)
-✓ Title is clear (descriptive, though long)
-✓ Description provides context (navigation path, scope note for US/UK/CA, Figma link, reference to prior US #1708534)
-✓ Acceptance Criteria: specific and testable (7 ACs in Given/When/Then format)
-✓ Acceptance Criteria: clear language (structured and unambiguous)
-✗ Acceptance Criteria: includes positive AND negative cases (all ACs cover positive behavior; no error scenarios, e.g., failed API call, empty parameter list, or boundary conditions)
+✓ Uses "As a [user], I want..., So that..." format (proper user story structure present)
+✓ Identifies user role (RM user clearly specified)
+✓ Specifies user goal (filter visibility and interaction behavior defined)
+✓ States user value (smooth user experience and visibility on selections)
+✓ Title is clear (descriptive of the feature being developed)
+✓ Description provides context (includes background and references to related work)
+✓ Acceptance Criteria: specific & testable (detailed Given-When-Then scenarios)
+✓ Acceptance Criteria: clear language (well-structured and understandable)
+✗ Acceptance Criteria: includes positive & negative cases (mainly positive scenarios, limited negative cases)
 
 **Score: 8.0 / 10**
-
----
 
 ### 2. Functional Requirements
 
-✓ Feature behavior defined (column filter aside display and mutual exclusivity with horizontal filters)
-✓ All user interactions listed (open aside, select parameter, remove via 'x', clear all, apply, close, navigate away)
-✓ Expected outcomes clear (each AC has explicit "Then" clauses)
-✓ Step-by-step user journey present (ACs 001–007 form a complete journey)
-✓ Integration with workflow described (interaction with horizontal filters in 006/007; property/FP dropdown in 004)
-✓ Entry/exit points defined (button click opens aside; Apply Filters closes aside; navigation resets in 005)
-✓ All possible user paths covered (select/apply/clear/retain/reset/mutual-exclusivity paths all present; note: Save and Cancel are flagged as "not developed yet" in AC004)
+✓ Feature behavior defined (column filter and horizontal filter interactions detailed)
+✓ All user interactions listed (click, select, apply, clear actions specified)
+✓ Expected outcomes clear (specific results for each action described)
+✓ Step-by-step user journey present (detailed workflows in acceptance criteria)
+✓ Integration with workflow described (interaction between different filter types)
+✓ Entry/exit points defined (navigation paths and state changes specified)
+✓ All possible user paths covered (multiple scenarios including state retention and clearing)
 
-**Score: 8.0 / 10**
-
----
+**Score: 9.0 / 10**
 
 ### 3. Validation Specifications
 
-✗ Test data requirements specified ("Not a Previously Required Field" — no sample data for parameters, property types, or grid content)
-✗ Sample scenarios provided (ACs describe behavior but no concrete data examples, e.g., "select 'Rent' and 'Occupancy' parameters")
-✓ Story is independently testable (each AC is self-contained with Given/When/Then)
-✓ Success/failure criteria defined (explicit acceptance outcomes in each AC)
-✗ Measurable outcomes present (no quantitative metrics; e.g., no threshold for grid render time, no parameter count limits)
+✓ Sample scenarios provided (multiple acceptance criteria with specific scenarios)
+✓ Story is independently testable (clear test cases in AC format)
+✓ Success/failure criteria defined (specific expected outcomes for each scenario)
+✓ Measurable outcomes present (UI state changes and grid behavior specified)
+✗ Test data requirements specified (no specific test data mentioned)
 
-**Score: 4.0 / 10**
-
----
+**Score: 7.0 / 10**
 
 ### 4. Non-Functional Requirements
 
-✗ Response time specified
-✗ Throughput specified
-✗ Resource utilization specified
-✗ Scalability addressed (US/UK/CA scope is market coverage, not a scalability requirement)
-✗ Access control defined (RM user role mentioned but no permissions or role-based access detail)
-✗ Data protection addressed
-✗ Compliance requirements stated
-✗ Logging/auditing covered
+✗ Response time specified (no performance metrics provided)
+✗ Throughput specified (no throughput requirements mentioned)
+✗ Resource utilization specified (no resource constraints defined)
+✗ Scalability addressed (no scalability considerations mentioned)
+✗ Access control defined (no security requirements specified)
+✗ Data protection addressed (no data protection requirements)
+✗ Compliance requirements stated (no compliance requirements mentioned)
+✗ Logging/auditing covered (no audit trail requirements specified)
 
-**Score: 1.0 / 10**
-
----
+**Score: 3.0 / 10**
 
 ### 5. UI/UX Requirements
 
-✓ Visual appearance described (blue highlight for selected items, 'x' deselect option, disabled state for Apply Filters button, section-wise layout with labels)
-✓ Layout/positioning specified (aside panel structure, "Column Filters" header, parameters grouped under corresponding section headers, alphabetical ordering within sections)
-✗ Responsiveness addressed (no mention of behavior on different screen sizes or breakpoints)
-✓ Design guidelines referenced (Figma prototype link present in description)
-✗ Browser/device support specified (not mentioned)
-✗ Backward compatibility addressed (grid width adjustment is a layout behavior, not a backward-compat requirement)
-✗ Platform requirements stated (US/UK/CA refers to market scope, not platform or OS)
-✗ Localization covered (multi-market scope noted but no localization detail: currency, date formats, language, etc.)
+✓ Visual appearance described (blue highlight, button states, grid width adjustments)
+✓ Layout/positioning specified (aside panel, sections, alphabetical ordering)
+✓ Design guidelines referenced (Figma prototype link provided)
+✗ Responsiveness addressed (no responsive design requirements specified)
+✗ Browser/device support specified (no browser compatibility mentioned)
+✗ Backward compatibility addressed (no compatibility requirements mentioned)
+✗ Platform requirements stated (no platform-specific requirements)
+✗ Localization covered (mentions US, UK, Canadian sites but no localization details)
 
-**Score: 4.0 / 10**
-
----
+**Score: 8.0 / 10**
 
 ### 6. API Requirements
 
-✗ Clear definition of endpoints
-✗ HTTP methods specified (GET, POST, PUT, DELETE)
-✗ Clear response format
-✗ Clear request parameters
-✗ Clear body format
-✗ Status codes and error messages specified
+✗ Clear definition of endpoints (no API endpoints specified)
+✗ HTTP methods specified (no HTTP methods mentioned)
+✗ Clear response format (no API response formats defined)
+✗ Clear request parameters (no API parameters specified)
+✗ Clear body format (no request body formats defined)
+✗ Status codes and error messages specified (no API error handling mentioned)
 
-**Score: 1.0 / 10**
-
----
+**Score: 2.0 / 10**
 
 ### 7. DB Requirements
 
-✗ Data that needs to be stored is identified (column filter selections are session-state per AC005; no explicit DB storage requirement)
-✗ Tables/collections specified
-✗ Data type or format checks defined
-✗ Constraints defined (NOT NULL, UNIQUE, etc.)
-✗ Relationships defined (foreign keys, one-to-many, etc.)
+✗ Data that needs to be stored is identified (no data storage requirements specified)
+✗ Tables/collections specified (no database schema mentioned)
+✗ Data type or format checks defined (no data validation rules specified)
+✗ Constraints defined (no database constraints mentioned)
+✗ Relationships defined (no entity relationships specified)
 
-**Score: 1.0 / 10**
+**Score: 2.0 / 10**
 
 ---
 
 ## Improvement Recommendations
 
 ### 1. Core Structure Improvements
-- Add at least one negative/error AC: what happens when parameter data fails to load, or when the filter API returns an error? e.g., *"Given the Column Filter aside is open, when the parameter list API fails, then a friendly error message is shown and the aside remains open"*
+- Add more negative test scenarios in acceptance criteria to cover edge cases and error conditions
 
 ### 2. Functional Requirements Improvements
-- Clarify behavior when Save and Cancel actions are developed (AC004 flags them as "not developed yet" — add follow-up stories or defer AC004's save/cancel scope explicitly)
-- Define whether column filter state persists in browser session storage or local storage
+- Consider adding error handling scenarios for when filters fail to apply or clear
 
 ### 3. Validation Specifications Improvements
-- Add test data examples: specify sample parameter names (e.g., "Rent", "Occupancy", "Unit Type") and expected grid column output
-- Add boundary scenarios: what happens when 0 parameters exist in the aside? What is the max number of selectable parameters?
-- Add measurable outcome: e.g., "aside should open within X milliseconds", or "grid should re-render within X seconds after Apply Filters"
+- Specify test data requirements including sample parameter values and property configurations
+- Define data sets needed for testing different filter combinations
 
 ### 4. Non-Functional Requirements Improvements
-- Specify response time target for aside open/close and grid re-render after applying filters
-- Define access control: is this feature available to all RM user roles, or specific sub-roles (e.g., admin vs. read-only)?
-- Address scalability: behavior when a property has hundreds of floor plan parameters
-- Specify logging: should filter apply/clear events be logged for usage analytics?
+- Add response time requirements for filter operations
+- Specify performance requirements for large data sets
+- Define access control requirements for different user roles
+- Add logging requirements for user actions and filter changes
 
-### 5. UI/UX Requirement Improvements
-- Add responsiveness requirement: behavior on tablet, small screen, or narrow browser window
-- Specify browser support: Chrome, Edge, Firefox minimum versions
-- Address localization: for UK/Canadian sites, confirm whether parameter labels and UI text require translation or locale-specific formatting
-- Clarify backward compatibility: does this aside replace or augment an existing filter mechanism?
+### 5. UI/UX Requirements Improvements
+- Specify responsive design requirements for different screen sizes
+- Add browser compatibility requirements
+- Define localization requirements beyond geographic scope
 
-### 6. API Requirement Improvements
-- Define the API endpoint(s) for fetching available column filter parameters (e.g., `GET /api/floorplan/parameters?propertyId=X`)
-- Define the API endpoint for applying/persisting filter state if server-side
-- Specify response schema: parameter object structure, section grouping field, display name
-- Document error response format (HTTP status codes + error body)
+### 6. API Requirements Improvements
+- Define API endpoints for filter operations
+- Specify request/response formats for filter data
+- Add error handling and status codes for API operations
+- Document authentication requirements
 
-### 7. DB Requirement Improvements
-- Clarify whether column filter selections are persisted server-side (DB) or client-side (session/local storage)
-- If server-side: identify the table/entity, user-filter association, and TTL or reset conditions
-- If client-side: document storage key names and data structure
+### 7. DB Requirements Improvements
+- Identify data storage requirements for filter configurations
+- Specify database schema for storing user filter preferences
+- Define data relationships between filters and other entities
+- Add data validation and constraint requirements
 
 ---
 
@@ -213,7 +173,8 @@ Furthermore I want that the horizontal filter option and Column filter option be
 
 - **Version:** 1.0
 - **Work Item State:** Closed
-- **Project:** AOS — Revenue Management Program > RM-Shalom
-- **Iteration:** AOS\\PI 23.Q4\\Sprint 23.26
-- **Generated By:** Manual User Story Evaluation
-- **Date:** 2026-04-16
+- **Work Item Type:** User Story
+- **Project:** AOS\Revenue Management Program\RM-Shalom
+- **Iteration:** AOS\PI 23.Q4\Sprint 23.26
+- **Generated By:** Automated User Story Evaluation Workflow
+- **Date:** 2026-04-22
