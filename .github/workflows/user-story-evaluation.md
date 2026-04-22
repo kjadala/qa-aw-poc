@@ -1,74 +1,56 @@
 ---
+description: |
+  Fetches an Azure DevOps work item via the rpdevops MCP server and produces a scored quality evaluation report (7-category weighted matrix) posted as a GitHub issue. Trigger via workflow_dispatch or with /evaluate <id> in an issue comment.
 engine: claude
-
 name: User Story Evaluation
-description: >
-  Fetches an Azure DevOps work item via the rpdevops MCP server and produces a
-  scored quality evaluation report (7-category weighted matrix) posted as a
-  GitHub issue. Trigger via workflow_dispatch or with /evaluate <id> in an issue comment.
-
-on:
+network:
+  allowed:
+  - tfs.realpage.com
+"on":
+  reaction: eyes
+  slash_command:
+    events:
+    - issue_comment
+    name: evaluate
+  status-comment: true
   workflow_dispatch:
     inputs:
-      work_item_id:
-        description: "Azure DevOps Work Item ID to evaluate (e.g. 12345)"
-        required: true
-        type: string
       excluded_categories:
+        default: None
         description: "Categories to exclude from scoring (comma-separated) or 'None'. Valid: Core Structure, Functional Requirements, Validation Specifications, UI/UX Requirements, API Requirements, DB Requirements, Non-Functional Requirements"
         required: false
-        default: "None"
         type: string
-  slash_command:
-    name: evaluate
-    events: [issue_comment]
-  reaction: eyes
-  status-comment: true
-
+      work_item_id:
+        description: Azure DevOps Work Item ID to evaluate (e.g. 12345)
+        required: true
+        type: string
 permissions:
   contents: read
   issues: read
-
 safe-outputs:
   create-issue:
-    title-prefix: "[US-Eval] "
-    labels: [user-story-evaluation, automated]
+    labels:
+    - user-story-evaluation
+    - automated
     max: 1
-
+    title-prefix: "[US-Eval] "
 secrets:
   AZDO_PAT:
-    value: "${{ secrets.AZDO_PAT }}"
-    description: "Azure DevOps Personal Access Token for tfs.realpage.com"
-  ARTIFACTORY_TOKEN:
-    value: "${{ secrets.ARTIFACTORY_TOKEN }}"
-    description: "JFrog Artifactory token for artifacts.realpage.com npm registry"
+    description: Azure DevOps Personal Access Token for tfs.realpage.com
+    value: ${{ secrets.AZDO_PAT }}
+timeout-minutes: 15
 
 mcp-servers:
   rpdevops:
     command: npx
     args:
       - "-y"
-      - "--registry=https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/"
-      - "@architecture/mcp-server-azuredevops@latest"
+      - "@azure-devops/mcp"
       - "Realpage"
+      - "tfs.realpage.com"
     env:
-      AZDO_BASE_URL: "https://tfs.realpage.com/tfs"
       AZDO_PAT: "${{ secrets.AZDO_PAT }}"
-      AZDO_PROJECT: "AOS"
-
-steps:
-  - name: Configure internal npm registry
-    run: npm config set @architecture:registry https://artifacts.realpage.com/artifactory/api/npm/npm-virtual/
-
-network:
-  allowed:
-    - artifacts.realpage.com
-    - tfs.realpage.com
-
-timeout-minutes: 15
-
 ---
-
 # User Story Evaluation Agent
 
 You are a **DETERMINISTIC User Story Evaluator**. For the same inputs your output must always be identical.
