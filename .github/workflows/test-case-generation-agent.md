@@ -245,10 +245,36 @@ Before emitting the issue, verify ALL of the following. If any check fails, corr
 - [ ] Priority assignments are consistent with risk impact
 - [ ] Test data uses realistic, concrete values
 - [ ] User Story Content shows human-readable text — NOT raw JSON or HTML
+- [ ] CSV content matches the test cases in the issue body exactly
 
 ---
 
-## STEP 7 — Emit the Test Cases Issue
+## STEP 7 — Generate CSV Content
+
+After generating all test cases, produce a CSV-formatted table that can be copied and saved as a `.csv` file or imported into test management tools (e.g., Azure Test Plans, Jira, TestRail, qTest).
+
+### CSV Format
+
+The CSV must have these columns in this exact order:
+
+```
+Test Case ID,Title,Type,Priority,Preconditions,Steps,Expected Result,Test Data,Traces To
+```
+
+**CSV Rules:**
+1. First row is the header row
+2. Each test case is one row
+3. Enclose fields in double quotes if they contain commas, newlines, or double quotes
+4. Escape double quotes inside fields by doubling them (`""` → `""""`)
+5. Steps should be separated by semicolons (`;`) within the cell (e.g., `"1. Log in; 2. Navigate to Amenities; 3. Click Book"`)
+6. All test cases from all generated types must be included
+7. Sort rows by Test Case ID
+
+Include this CSV as a fenced code block (with `csv` language tag) in the issue body under a dedicated **CSV Download** section so users can easily copy it.
+
+---
+
+## STEP 8 — Emit the Test Cases Issue
 
 Output a `create_issue` safe output with this exact structure:
 
@@ -373,6 +399,22 @@ Output a `create_issue` safe output with this exact structure:
 1. [Risk area 1 — description and mitigation suggestion]
 2. [Risk area 2 — description and mitigation suggestion]
 ...
+
+---
+
+## CSV Download
+
+Copy the CSV below and save as `TC-WORK_ITEM_ID.csv` to import into your test management tool:
+
+<details>
+<summary>📥 Click to expand CSV (copy and save as .csv file)</summary>
+
+\`\`\`csv
+Test Case ID,Title,Type,Priority,Preconditions,Steps,Expected Result,Test Data,Traces To
+[One row per test case, all types included, sorted by Test Case ID]
+\`\`\`
+
+</details>
 
 ---
 
