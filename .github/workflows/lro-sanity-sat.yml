@@ -34,11 +34,19 @@ jobs:
       - name: Checkout LRO-RC-Automation from TFS
         env:
           TFS_PAT: ${{ secrets.TFS_PAT }}
+          # Never block on an interactive credential prompt: fail fast instead.
+          GIT_TERMINAL_PROMPT: "0"
+          GCM_INTERACTIVE: "Never"
         run: |
+          $ErrorActionPreference = "Stop"
           $dest = "${{ github.workspace }}\LRO-RC-Automation"
           if (Test-Path $dest) { Remove-Item -Path $dest -Recurse -Force }
           $b64 = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$env:TFS_PAT"))
-          git -c http.extraheader="Authorization: Basic $b64" clone --branch master --single-branch "https://tfs.realpage.com/tfs/Realpage/AOS/_git/LRO-RC-Automation" "$dest"
+          git `
+            -c http.extraheader="Authorization: Basic $b64" `
+            -c credential.helper= `
+            clone --depth 1 --branch master --single-branch `
+            "https://tfs.realpage.com/tfs/Realpage/AOS/_git/LRO-RC-Automation" "$dest"
           if ($LASTEXITCODE -ne 0) { throw "TFS clone failed (exit $LASTEXITCODE)" }
           Write-Host "Cloned LRO-RC-Automation to $dest"
 
