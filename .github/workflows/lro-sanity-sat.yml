@@ -1,0 +1,158 @@
+name: LRO-Sanity-UI | SAT
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite_name:
+        description: 'TestNG suite XML filename'
+        required: false
+        default: 'SanitySuite.xml'
+
+env:
+  REPORT_FILES: LRO-Sanity-UI-${{ github.run_number }}-SAT.zip
+  REPORTS_PATH: ${{ github.workspace }}\LRO-RC-Automation\Reports
+  REPORT_DOWNLOAD_PATH: https://artifacts.realpage.com/artifactory/rp-nondeployables-local/lro/automation/builds/reports/LRO-Sanity-UI-${{ github.run_number }}-SAT.zip
+  SUITE_NAME: ${{ github.event.inputs.suite_name || 'SanitySuite.xml' }}
+
+jobs:
+  SAT:
+    name: Run SAT Sanity Tests
+    runs-on: [self-hosted, RCQLROAPLRO003-AUTO-BLD01]
+    environment: SAT
+    continue-on-error: false
+
+    steps:
+      - name: Checkout LRO-RC-Automation
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      # ── Task 1: Remove Reports ──────────────────────────────────────────
+      - name: Remove Reports
+        if: always()
+        shell: pwsh
+        run: |
+          $ReportsPath = "${{ env.REPORTS_PATH }}"
+          if (Test-Path -Path "$ReportsPath") {
+            Remove-Item -Path "$ReportsPath" -Force -Recurse
+            Write-Host "Deleted files from Reports Directory"
+          } else {
+            Write-Host "Nothing to delete from Report Directory"
+          }
+
+      # ── Task 2: Maven Test ──────────────────────────────────────────────
+      - name: Maven Test
+        if: success()
+        shell: cmd
+        run: |
+          mvn clean install -PSuite ^
+            -DSuiteName="TestRunner\LRO\${{ env.SUITE_NAME }}" ^
+            -Denv=sat ^
+            -Demail_recipients="${{ secrets.EMAIL_RECIPIENTS }}" ^
+            -DreleaseUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" ^
+            -DreportDownload="${{ env.REPORT_DOWNLOAD_PATH }}" ^
+            --settings "${{ github.workspace }}\LRO-RC-Automation\settings.xml" ^
+            -f "${{ github.workspace }}\LRO-RC-Automation\pom.xml"
+        env:
+          MAVEN_OPTS: -Xmx1024m
+
+      # ── Publish JUnit Results ───────────────────────────────────────────
+      - name: Publish JUnit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-SAT
+          path: '**/surefire-reports/TEST-*.xml'
+          if-no-files-found: warn
+
+      # ── Task 3: Archive (primary) ───────────────────────────────────────
+      - name: Archive Reports (primary)
+        if: always()
+        shell: pwsh
+        run: |
+          $src  = "${{ env.REPORTS_PATH }}"
+          $dest = "${{ github.workspace }}\${{ env.REPORT_FILES }}"
+          if (Test-Path $src) {
+            Compress-Archive -Path "$src\*" -DestinationPath $dest -Force
+            Write-Host "Archived to $dest"
+          } else {
+            Write-Host "Reports folder not found, skipping archive."
+          }
+
+      # ── Task 4: Archive copy ────────────────────────────────────────────
+      - name: Archive Reports (copy)
+        if: always()
+        shell: pwsh
+        run: |
+          $src  = "${{ env.REPORTS_PATH }}"
+          $dest = "${{ env.REPORTS_PATH }}\${{ env.REPORT_FILES }}"
+          if (Test-Path $src) {
+            Compress-Archive -Path "$src\*" -DestinationPath $dest -Force
+            Write-Host "Archive copy created at $dest"
+          } else {
+            Write-Host "Reports folder not found, skipping archive copy."
+          }
+
+      # ── Task 5: Copy to ExeReports ──────────────────────────────────────
+      - name: Copy Reports to ExeReports
+        if: always()
+        shell: pwsh
+        run: |
+          $src  = "${{ env.REPORTS_PATH }}\${{ env.REPORT_FILES }}"
+          $dest = "D:\ExeReports\"
+          if (Test-Path $src) {
+            if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest | Out-Null }
+            Copy-Item -Path $src -Destination $dest -Force
+            Write-Host "Copied to $dest"
+          } else {
+            Write-Host "Archive not found, skipping copy."
+          }
+
+      # ── Task 6: Upload to Artifactory ───────────────────────────────────
+      - name: Upload to Artifactory
+        if: always()
+        shell: pwsh
+        run: |
+          jf rt u `
+            "${{ env.REPORTS_PATH }}\${{ env.REPORT_FILES }}" `
+            "rp-nondeployables-local/lro/automation/builds/reports/${{ env.REPORT_FILES }}" `
+            --threads=3 `
+            --retries=3
+        env:
+          JFROG_CLI_OFFER_CONFIG: false
+          JF_URL: https://artifacts.realpage.com
+          JF_ACCESS_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+
+      # ── Task 7: Send Email ───────────────────────────────────────────────
+      - name: Send Email Notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        continue-on-error: true
+        with:
+          server_address: mail.realpage.com
+          server_port: 25
+          subject: "AOS::LRO-Sanity-UI-${{ github.run_number }} - SAT env"
+          to: ${{ secrets.EMAIL_RECIPIENTS }}
+          cc: ravindranath.ciddagoni@realpage.com
+          from: no_reply_QA@realpage.com
+          body: |
+            Hi Team,
+
+            Please find the execution automation results for LRO-Sanity-UI-${{ github.run_number }} on SAT env
+
+            Job Status: ${{ job.status }}
+            SuiteFileName: ${{ env.SUITE_NAME }}
+
+            Release Web URL:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Refer to the Artifacts execution results report:
+            https://artifacts.realpage.com/ui/repos/tree/General/rp-nondeployables-local%2Flro%2Fautomation%2Fbuilds%2Freports%2F${{ env.REPORT_FILES }}
+
+            Download report:
+            ${{ env.REPORT_DOWNLOAD_PATH }}
+
+            Release Triggered By: ${{ github.actor }}
+
+            Thanks & Regards,
+            Automation Team
