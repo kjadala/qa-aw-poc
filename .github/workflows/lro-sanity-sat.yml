@@ -46,10 +46,16 @@ jobs:
             $candidates = @(
               "C:\Program Files\Git\cmd\git.exe",
               "C:\Program Files (x86)\Git\cmd\git.exe",
+              "C:\Users\kjadala\AppData\Local\Programs\Git\cmd\git.exe",
               "$env:LOCALAPPDATA\Programs\Git\cmd\git.exe",
               "$env:USERPROFILE\AppData\Local\Programs\Git\cmd\git.exe"
             )
             $git = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+          # Last resort: search all user profiles for a per-user Git install.
+          if (-not $git) {
+            $git = (Get-ChildItem "C:\Users\*\AppData\Local\Programs\Git\cmd\git.exe" -ErrorAction SilentlyContinue |
+                    Select-Object -First 1).FullName
           }
           if (-not $git) { throw "git.exe not found on the runner." }
           Write-Host "Using git at: $git"
