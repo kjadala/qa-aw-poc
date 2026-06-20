@@ -21,7 +21,7 @@ env:
 jobs:
   SAT:
     name: Run SAT Sanity Tests
-    runs-on: [self-hosted, HIN-7YW4C54-LT]
+    runs-on: [self-hosted, Windows, X64]
     environment: SAT
     continue-on-error: false
 
