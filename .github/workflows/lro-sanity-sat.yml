@@ -21,7 +21,7 @@ env:
 jobs:
   SAT:
     name: Run SAT Sanity Tests
-    runs-on: [self-hosted, "${{ inputs.runner_label || 'RCQLROAPLRO003-AUTO-BLD01' }}"]
+    runs-on: [self-hosted, HIN-7YW4C54-LT]
     environment: SAT
     continue-on-error: false
 
