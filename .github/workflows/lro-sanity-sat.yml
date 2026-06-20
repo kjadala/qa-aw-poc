@@ -39,10 +39,25 @@ jobs:
           GCM_INTERACTIVE: "Never"
         run: |
           $ErrorActionPreference = "Stop"
+
+          # Resolve git.exe: it may not be on the runner service PATH even when installed.
+          $git = (Get-Command git.exe -ErrorAction SilentlyContinue).Source
+          if (-not $git) {
+            $candidates = @(
+              "C:\Program Files\Git\cmd\git.exe",
+              "C:\Program Files (x86)\Git\cmd\git.exe",
+              "$env:LOCALAPPDATA\Programs\Git\cmd\git.exe",
+              "$env:USERPROFILE\AppData\Local\Programs\Git\cmd\git.exe"
+            )
+            $git = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+          if (-not $git) { throw "git.exe not found on the runner." }
+          Write-Host "Using git at: $git"
+
           $dest = "${{ github.workspace }}\LRO-RC-Automation"
           if (Test-Path $dest) { Remove-Item -Path $dest -Recurse -Force }
           $b64 = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$env:TFS_PAT"))
-          git `
+          & $git `
             -c http.extraheader="Authorization: Basic $b64" `
             -c credential.helper= `
             clone --depth 1 --branch master --single-branch `
