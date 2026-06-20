@@ -7,6 +7,10 @@ on:
         description: 'TestNG suite XML filename'
         required: false
         default: 'SanitySuite.xml'
+      runner_label:
+        description: 'Self-hosted runner label (e.g. RCQLROAPLRO003-AUTO-BLD01)'
+        required: false
+        default: 'RCQLROAPLRO003-AUTO-BLD01'
 
 env:
   REPORT_FILES: LRO-Sanity-UI-${{ github.run_number }}-SAT.zip
@@ -17,7 +21,7 @@ env:
 jobs:
   SAT:
     name: Run SAT Sanity Tests
-    runs-on: [self-hosted, RCQLROAPLRO003-AUTO-BLD01]
+    runs-on: [self-hosted, "${{ inputs.runner_label || 'RCQLROAPLRO003-AUTO-BLD01' }}"]
     environment: SAT
     continue-on-error: false
 
