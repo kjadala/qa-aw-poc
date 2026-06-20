@@ -25,14 +25,13 @@ jobs:
     environment: SAT
     continue-on-error: false
 
-    steps:
-      - name: Checkout workflow repo (qa-aw-poc)
-        uses: actions/checkout@v4
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass -Command ". '{0}'"
 
+    steps:
       # ── Checkout LRO-RC-Automation from TFS ─────────────────────────────
       - name: Checkout LRO-RC-Automation from TFS
-        if: success()
-        shell: powershell
         env:
           TFS_PAT: ${{ secrets.TFS_PAT }}
         run: |
@@ -46,7 +45,6 @@ jobs:
       # ── Task 1: Remove Reports ──────────────────────────────────────────
       - name: Remove Reports
         if: always()
-        shell: powershell
         run: |
           $ReportsPath = "${{ env.REPORTS_PATH }}"
           if (Test-Path -Path "$ReportsPath") {
@@ -84,7 +82,6 @@ jobs:
       # ── Task 3: Archive (primary) ───────────────────────────────────────
       - name: Archive Reports (primary)
         if: always()
-        shell: powershell
         run: |
           $src  = "${{ env.REPORTS_PATH }}"
           $dest = "${{ github.workspace }}\${{ env.REPORT_FILES }}"
@@ -98,7 +95,6 @@ jobs:
       # ── Task 4: Archive copy ────────────────────────────────────────────
       - name: Archive Reports (copy)
         if: always()
-        shell: powershell
         run: |
           $src  = "${{ env.REPORTS_PATH }}"
           $dest = "${{ env.REPORTS_PATH }}\${{ env.REPORT_FILES }}"
@@ -112,7 +108,6 @@ jobs:
       # ── Task 5: Copy to ExeReports ──────────────────────────────────────
       - name: Copy Reports to ExeReports
         if: always()
-        shell: powershell
         run: |
           $src  = "${{ env.REPORTS_PATH }}\${{ env.REPORT_FILES }}"
           $dest = "D:\ExeReports\"
@@ -127,7 +122,6 @@ jobs:
       # ── Task 6: Upload to Artifactory ───────────────────────────────────
       - name: Upload to Artifactory
         if: always()
-        shell: powershell
         run: |
           jf rt u `
             "${{ env.REPORTS_PATH }}\${{ env.REPORT_FILES }}" `
