@@ -172,7 +172,7 @@ jobs:
           server_port: 25
           subject: "AOS::LRO-Sanity-UI-${{ github.run_number }} - SAT env"
           to: ${{ secrets.EMAIL_RECIPIENTS }}
-          cc: ravindranath.ciddagoni@realpage.com
+          cc: krishna.jadala@realpage.com
           from: no_reply_QA@realpage.com
           body: |
             Hi Team,
