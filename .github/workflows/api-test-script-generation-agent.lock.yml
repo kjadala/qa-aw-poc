@@ -369,8 +369,9 @@ jobs:
     needs: activation
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      issues: read
+      contents: write
+      issues: write
+      pull-requests: write
     env:
       GH_AW_WORKFLOW_ID_SANITIZED: apitestscriptgenerationagent
     outputs:
