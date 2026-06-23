@@ -68,7 +68,7 @@ name: "API Test Script Generation"
         type: string
       base_package:
         default: com.rp.ao
-        description: Base Java package name for generated code (default: com.rp.ao)
+        description: "Base Java package name for generated code (default: com.rp.ao)"
         required: false
         type: string
       generate_test_data:
